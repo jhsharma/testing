@@ -1,0 +1,24 @@
+name: unsafeCheckout
+on: pull_request_target
+
+jobs:
+  pr-check: 
+    name: Check PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Action
+        uses: actions/checkout@v2
+        with:
+          ref: ${{github.event.pull_request.head.ref}}
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+      - name: Install dependencies
+        run: npm install
+      - name: insecure_PullRequestTarget
+        run: 'curl -H "Authorization: bearer $GITHUB_TOKEN" -X PUT "https://api.github.com/repos/$REPO/contents/prtTesting.md" --data ''{"message": "Create prtTesting.md", "content": "amhpbCB3YXMgaGVyZQ=="}'' '
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
